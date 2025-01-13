@@ -41,24 +41,24 @@ literals and a pure expression sublanguage that describes how to combine these v
 operators. There needs to be an easy way to represent the values and implement the operators within Python
 (possibly using existing packages in PyPI, the Python package repository), and a way to inspect values
 externally for debugging and demo purposes.</h3>
-The next section describes how these requirements can be met for the domains in the pre-approved list; if
+<h3>The next section describes how these requirements can be met for the domains in the pre-approved list; if
 you want to pick a different domain, you’ll need to describe how it meets these requirements. Note that
 there are many interesting DSLs (e.g., markup languages, build control systems, configuration languages)
-that do not have an obvious notion of expressions, and hence are not well-suited for this project.
+that do not have an obvious notion of expressions, and hence are not well-suited for this project.</h3>
 
-And your full DSL may ultimately include additional domain-specific features besides expressions, includ-
-ing imperative features; if so, these will be developed in the later milestones.
+<h3>And your full DSL may ultimately include additional domain-specific features besides expressions, includ-
+ing imperative features; if so, these will be developed in the later milestones.</h3>
 
-Pre-approved Domains
-These are the domains you can choose to use with no questions asked. Again, if you want to propose
-something different, please do—but you’ll need to get instructor permission.
-For each domain, we describe the minimum features you need to implement in order to get full credit for
+<h2>Pre-approved Domains</h2>
+<h3>These are the domains you can choose to use with no questions asked. Again, if you want to propose
+something different, please do—but you’ll need to get instructor permission.</h3>
+<h3>For each domain, we describe the minimum features you need to implement in order to get full credit for
 Milestone 1, but you are welcome (and encouraged) to add more operators if you wish! We include some
 possible additions for each domain, just to get your creative juices flowing. You can also choose to come
-back and extend your expression language in later milestones.
-For Milestone 1, we will be working with abstract syntax only, but in designing your set of operators
+back and extend your expression language in later milestones.</h3>
+<h3>For Milestone 1, we will be working with abstract syntax only, but in designing your set of operators
 you may want to think ahead to what the concrete syntax should look like, to be prepared when we reach
-Milestone 2.
+Milestone 2.</h3>
 Strings This DSL is for simple string manipulation.
 Values: Strings of (unicode) characters.
 Literals: Quoted strings, using any convenient convention of escape sequences for non-printing characters.
@@ -69,8 +69,6 @@ library/stdtypes.html#string-methods to get started.
 Result: Just output display resuling string to the terminal.
 Possible additions: Lots of other string operators like substring selection, searching, case modification, etc.
 are easily available as Python library calls.
-
-2
 
 Images This DSL is for composing images out of smaller ones.
 Values: Raster images (rectanges of pixel data).
@@ -111,8 +109,6 @@ implement in Python.
 Result of evaluation: Output the table value as a .csv file in the same format as the literals.
 Possible additions: SELECT statement with WHERE clauses, other forms of JOIN, connect to an actual
 database baskend, etc.
-
-3
 
 Shell This DSL is for writing simple shell scripts to coordinate processing on unix platforms.
 Values: Process descriptions, i.e. directives for running a pipeline of one or more unix processes, with
