@@ -16,31 +16,31 @@ language as we go, so that later milestones will include more language features.
 <li>Milestone 3 (due 3/5): AST, evaluator and parser for functions, statements and expanded features</li>
 <li>Final version (due 3/17): More expanded features, and static checker for everything</li>
 </ul>
-Core Language
-Everyone will implement the same core language. Details of this will be defined as we go, but for Milestone
-1, it consists of a pure expression language containing:
-• Numeric literals and arithmetic operations (+,-,etc.)
-• Boolean literals and boolean operations (and, or, etc.)
-• Relational operators (==, <, etc.)
-• let bindings and variables
-A “program” is just an expression and the effect of running the program is just to display the value of that
-expression.
-All the pieces needed for this will be shown in class or developed in the practice exercises, so building the
+<h2>Core Language</h2>
+<h3>Everyone will implement the same core language. Details of this will be defined as we go, but for Milestone
+1, it consists of a pure expression language containing:</h3>
+<ul>
+<li>Numeric literals and arithmetic operations (+,-,etc.)</li>
+<li>Boolean literals and boolean operations (and, or, etc.)</li>
+<li>Relational operators (==, <, etc.)</li>
+<li>let bindings and variables</li>
+</ul>
+<h3>A “program” is just an expression and the effect of running the program is just to display the value of that
+expression.</h3>
+<h3>All the pieces needed for this will be shown in class or developed in the practice exercises, so building the
 core langauge will be largely a matter of combining things in right way. Initially, we will write programs
-directly as abstract syntax; parsing will come in the second milestone.
+directly as abstract syntax; parsing will come in the second milestone.</h3>
 
-1
-
-Domain-specific Extension
-In addition to the core language, you will design and implement a set of domain-specific extensions for a
+<h2>Domain-specific Extension</h2>
+<h3>In addition to the core language, you will design and implement a set of domain-specific extensions for a
 domain of your choice. The result will be a domain-specific language (DSL) tailored to writing programs
 for a particular purpose. You may choose from the domains described below, or pick a different domain with
-prior permission of the instructor.
-For purposes of this project, it is important that your DSL have a useful notion of domain-specific values and
+prior permission of the instructor.</h3>
+<h3>For purposes of this project, it is important that your DSL have a useful notion of domain-specific values and
 literals and a pure expression sublanguage that describes how to combine these values using domain-specific
 operators. There needs to be an easy way to represent the values and implement the operators within Python
 (possibly using existing packages in PyPI, the Python package repository), and a way to inspect values
-externally for debugging and demo purposes.
+externally for debugging and demo purposes.</h3>
 The next section describes how these requirements can be met for the domains in the pre-approved list; if
 you want to pick a different domain, you’ll need to describe how it meets these requirements. Note that
 there are many interesting DSLs (e.g., markup languages, build control systems, configuration languages)
