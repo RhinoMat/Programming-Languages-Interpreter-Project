@@ -1,5 +1,7 @@
 # Interpreter that does boolean operations and normal arithmetic
+# Module imports for processing
 from dataclasses import dataclass
+from typing import Any
 type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name
 @dataclass
 class Add():
@@ -47,3 +49,6 @@ class Name():
     var_name: str
     def __str__(self) -> str:
         return self.var_name
+
+type Bind[V] = tuple[str, V]
+type Environment[V] = tuple[Bind[V], ...]
