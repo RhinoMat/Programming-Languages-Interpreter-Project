@@ -108,66 +108,26 @@ type blank = int | bool
 def eval(e: ExpressionType) -> blank:
     return evalInEnv(blank_env, e)
 def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
-    '''match e:
-        case Add(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (int(left_val), int(right_val)):
-                    return evalInEnv(env, left_val) + evalInEnv(env, right_val)
-                case _:
-                    raise evaluate_error("addition of values that are not integers")
-        case Sub(left_val,right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (int(left_val), int(right_val)):
-                    return evalInEnv(env,left_val) - evalInEnv(env,right_val)
-                case _:
-                    raise evaluate_error("subtraction of values that are not integers")
-        case Mul(left_val,right_val):
-            leftv = evalInEnv(env,left_val)
-            rightv = evalInEnv(env,right_val)
-            match (leftv, rightv):
-                case (int(leftv), int(rightv)):
-                    return leftv * rightv
-                case _:
-                    raise evaluate_error("multiplication of values that are not integers")
-        case Div(left_val,right_val):
-            leftv = evalInEnv(env,left_val)
-            rightv = evalInEnv(env,right_val)
-            if rightv == 0:
-                raise evaluate_error("division by zero")
-            return leftv // rightv
-        case Neg(sub):
-            return - (evalInEnv(env,sub))
-        case Lit(int_val):
-            return int_val
-        case Name(name_val):
-            val = lookup_environment(name_val, env)
-            if val is None:
-                raise evaluate_error(f"unbound name {name_val}")
-            return val
-        case Let(name,def_expr,body):
-            val = evalInEnv(env, def_expr)
-            newEnv = extend_environment(name, val, env)
-            return evalInEnv(newEnv, body) 
-        '''
     match e:
+        # environment implementation for integer arithmetic
         case Add(left_val,right_val):
             match (evalInEnv(env,left_val), evalInEnv(env,right_val)):
                 case (int(lv), int(rv)):
                     return lv + rv
                 case _:
-                    raise EvalError("addition of non-integer values")
+                    raise evaluate_error("addition of non-integer values")
         case Sub(left_val,right_val):
             match (evalInEnv(env,left_val), evalInEnv(env,right_val)):
                 case (int(lv), int(rv)):
                     return lv - rv
                 case _:
-                    raise EvalError("subtraction of non-integer values")
+                    raise evaluate_error("subtraction of non-integer values")
         case Mul(left_val,right_val):
             match (evalInEnv(env,left_val), evalInEnv(env,right_val)):
                 case (int(lv), int(rv)):
                     return lv * rv
                 case _:
-                    raise EvalError("multiplication of non-integer values")
+                    raise evaluate_error("multiplication of non-integer values")
         case Div(left_val,right_val):
             match (evalInEnv(env,left_val), evalInEnv(env,right_val)):
                 case (int(lv), int(rv)):
@@ -175,14 +135,52 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                         raise evaluate_error("division by zero")
                     return lv // rv
                 case _:
-                    raise EvalError("division of non-integer values")                
+                    raise evaluate_error("division of non-integer values")                
         case Neg(s):
             match evalInEnv(env,s):
                 case int(i):
                     return -i
                 case _:
                     raise evaluate_error("negation of non-integer value")
-        case(Lit(lit)):
+        # environment implementation of boolean arithmetic
+        case And(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (bool(lv), bool(rv)):
+                    return lv and rv
+                case _:
+                    raise evaluate_error("AND comparison of non-boolean values")
+        case Or(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (bool(lv), bool(rv)):
+                    return lv or rv
+                case _:
+                    raise evaluate_error("OR comparison of non-boolean values")
+        case Not(subexpression):
+            match (evalInEnv(env, subexpression)):
+                case (bool(i)):
+                    return not i
+                case _:
+                    raise evaluate_error("NOT transformation of a non-boolean value")
+        case Eq(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (bool(lv), bool(rv)):
+                    return lv == rv
+                case _:
+                    raise evaluate_error("EQ comparison of non-boolean values")
+        case Lt(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (int(lv), int(rv)):
+                    return lv < rv
+                case _:
+                    raise evaluate_error("LT comparison of non-integer values")        
+        case If(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (bool(lv), bool(rv)):
+                    return lv or rv
+                case _:
+                    raise evaluate_error("OR comparison of non-boolean values")
+        # environment implementation of let and binding
+        case Lit(lit) :
             match lit:  # two-level matching keeps type-checker happy
                 case int(i):
                     return i
@@ -198,9 +196,8 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
 def run(e: ExpressionType) -> None:
     print(f"running: {e}")
     try:
-        i = eval(e)
-        print(f"result: {i}")
+        match eval(e):
+            case int(i):
+                print(f"result: {i}")
     except evaluate_error as err:
         print(err)
-
-
