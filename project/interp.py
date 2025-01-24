@@ -1,7 +1,7 @@
 # Interpreter that does boolean operations and normal arithmetic
 # Module imports for processing
 from dataclasses import dataclass
-from midiutil import MIDIFile
+#from midiutil import MIDIFile
 type LiteralVal = int | bool
 type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | Lt | If
 # Integer Literal Arithmetic
@@ -66,9 +66,11 @@ class Lt():
         return f"({self.left_val} < {self.right_val})"
 @dataclass
 class If():
-    subexpression: ExpressionType
+    condition: ExpressionType
+    then_sect: ExpressionType
+    else_sect: ExpressionType
     def __str__(self) -> str:
-        return f"(if {self.subexpression})"
+        return f"(if {self.condition} then {self.then_sect} else {self.else_sect})"
 # Value Declaration and name assignment
 @dataclass
 class Lit():
@@ -173,12 +175,15 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                     return lv < rv
                 case _:
                     raise evaluate_error("LT comparison of non-integer values")        
-        case If(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (bool(lv), bool(rv)):
-                    return lv or rv
+        case If(condition, then_sect, else_sect):
+            match (evalInEnv(env, condition)):
+                case (bool(c)):
+                    if c:
+                        return evalInEnv(env, then_sect)
+                    else:
+                        return evalInEnv(env, else_sect)
                 case _:
-                    raise evaluate_error("OR comparison of non-boolean values")
+                    raise evaluate_error("IF condition of a non-boolean value")
         # environment implementation of let and binding
         case Lit(lit) :
             match lit:  # two-level matching keeps type-checker happy
