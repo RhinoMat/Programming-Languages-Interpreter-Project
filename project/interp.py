@@ -70,7 +70,7 @@ class If():
     then_sect: ExpressionType
     else_sect: ExpressionType
     def __str__(self) -> str:
-        return f"(if {self.condition} then {self.then_sect} else {self.else_sect})"
+        return f"(if {self.condition} \n\tthen {self.then_sect} \n\telse {self.else_sect})"
 # Value Declaration and name assignment
 @dataclass
 class Lit():
