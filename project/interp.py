@@ -2,8 +2,8 @@
 # Module imports for processing
 from dataclasses import dataclass
 #from midiutil import MIDIFile
-type LiteralVal = int | bool
-type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | Lt | If
+type LiteralVal = int | bool | str
+type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | Lt | If | Append | Replace
 # Integer Literal Arithmetic
 @dataclass
 class Add():
@@ -71,6 +71,18 @@ class If():
     else_sect: ExpressionType
     def __str__(self) -> str:
         return f"(if {self.condition} \n\tthen {self.then_sect} \n\telse {self.else_sect})"
+# Domain-specific Library functions and implementation
+class Append():
+    left_val: ExpressionType
+    right_val: ExpressionType
+    def __str__(self) -> str:
+        return f"({self.left_val} += {self.right_val})"
+class Replace():
+    initial_string: ExpressionType
+    to_replace: ExpressionType
+    replacement: ExpressionType
+    def __str__(self) -> str:
+        return f"(in {self.initial_string} replacing first {self.to_replace} with {self.replacement})"
 # Value Declaration and name assignment
 @dataclass
 class Lit():
@@ -106,7 +118,7 @@ def lookup_environment[V](name: str, env: Environment[V]) -> (V | None):
             return None
 class evaluate_error(Exception):
     pass
-type blank = int | bool
+type blank = int | bool | str
 def eval(e: ExpressionType) -> blank:
     return evalInEnv(blank_env, e)
 def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
@@ -184,6 +196,19 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                         return evalInEnv(env, else_sect)
                 case _:
                     raise evaluate_error("IF condition of a non-boolean value")
+        # environment implementation for domain-specific functions
+        case Append(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (str(lv), str(rv)):
+                    return lv + rv
+                case _:
+                    raise evaluate_error("appending of non-string values")
+        case Replace(initial_string, to_replace, replacement):
+            match (evalInEnv(env, initial_string), evalInEnv(env, to_replace), evalInEnv(env, replacement)):
+                case(str(istring), str(torep), str(repl)):
+                    return istring.replace(torep, repl, 1)
+                case _:
+                    raise evaluate_error("REPLACE operation with non-string values")
         # environment implementation of let and binding
         case Lit(lit) :
             match lit:  # two-level matching keeps type-checker happy
