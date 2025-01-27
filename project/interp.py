@@ -72,11 +72,13 @@ class If():
     def __str__(self) -> str:
         return f"(if {self.condition} \n\tthen {self.then_sect} \n\telse {self.else_sect})"
 # Domain-specific Library functions and implementation
+@dataclass
 class Append():
     left_val: ExpressionType
     right_val: ExpressionType
     def __str__(self) -> str:
         return f"({self.left_val} += {self.right_val})"
+@dataclass
 class Replace():
     initial_string: ExpressionType
     to_replace: ExpressionType
@@ -214,6 +216,10 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
             match lit:  # two-level matching keeps type-checker happy
                 case int(i):
                     return i
+                case bool(i):
+                    return i
+                case str(i):
+                    return i
         case Name(n):
             v = lookup_environment(n, env)
             if v is None:
@@ -228,6 +234,10 @@ def run(e: ExpressionType) -> None:
     try:
         match eval(e):
             case int(i):
+                print(f"result: {i}")
+            case bool(i):
+                print(f"result: {i}")
+            case str(i):
                 print(f"result: {i}")
     except evaluate_error as err:
         print(err)
