@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 #from midiutil import MIDIFile
 type LiteralVal = int | bool | str
-type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | Lt | If | Append | Replace
+type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | NEq | Lt | LtE | Gt | GtE | If | Append | Replace
 # Integer Literal Arithmetic
 @dataclass
 class Add():
@@ -59,11 +59,35 @@ class Eq():
     def __str__(self) -> str:
         return f"({self.left_val} == {self.right_val})"
 @dataclass
+class NEq():
+    left_val: ExpressionType
+    right_val: ExpressionType
+    def __str__(self) -> str:
+        return f"({self.left_val} != {self.right_val})"
+@dataclass
 class Lt():
     left_val:ExpressionType
     right_val: ExpressionType
     def __str__(self) -> str:
         return f"({self.left_val} < {self.right_val})"
+@dataclass
+class LtE():
+    left_val:ExpressionType
+    right_val: ExpressionType
+    def __str__(self) -> str:
+        return f"({self.left_val} <= {self.right_val})"
+@dataclass
+class Gt():
+    left_val:ExpressionType
+    right_val: ExpressionType
+    def __str__(self) -> str:
+        return f"({self.left_val} > {self.right_val})"
+@dataclass
+class GtE():
+    left_val:ExpressionType
+    right_val: ExpressionType
+    def __str__(self) -> str:
+        return f"({self.left_val} >= {self.right_val})"
 @dataclass
 class If():
     condition: ExpressionType
@@ -183,12 +207,36 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                     return lv == rv
                 case _:
                     raise evaluate_error("EQ comparison of non-boolean values")
+        case NEq(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (bool(lv), bool(rv)):
+                    return lv != rv
+                case _:
+                    raise evaluate_error("NEQ comparison of non-boolean values")
         case Lt(left_val, right_val):
             match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
                 case (int(lv), int(rv)):
                     return lv < rv
                 case _:
-                    raise evaluate_error("LT comparison of non-integer values")        
+                    raise evaluate_error("LT comparison of non-integer values")    
+        case LtE(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (int(lv), int(rv)):
+                    return lv <= rv
+                case _:
+                    raise evaluate_error("LTE comparison of non-integer values")
+        case Gt(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (int(lv), int(rv)):
+                    return lv > rv
+                case _:
+                    raise evaluate_error("GT comparison of non-integer values")
+        case GtE(left_val, right_val):
+            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+                case (int(lv), int(rv)):
+                    return lv >= rv
+                case _:
+                    raise evaluate_error("GTE comparison of non-integer values")
         case If(condition, then_sect, else_sect):
             match (evalInEnv(env, condition)):
                 case (bool(c)):
