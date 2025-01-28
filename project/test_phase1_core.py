@@ -305,15 +305,15 @@ class TestEval(TestCase):
         expr = Eq(Lit(False), Lit(False))
         self.expect(expr, True)
 
-    def test_eq_type_error(self):
+    def test_eq_type_mismatch(self):
         # false == 0
-        # => error
+        # => False
         expr = Eq(Lit(False), Lit(0))
-        self.expect_error(expr)
+        self.expect(expr, False)
         # 1 == true
-        # => error
+        # => False
         expr = Eq(Lit(1), Lit(True))
-        self.expect_error(expr)
+        self.expect(expr, False)
 
     def test_lt(self):
         # 24 < 61

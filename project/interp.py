@@ -288,20 +288,8 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
             left_eval = evalInEnv(env, left_val)
             right_eval = evalInEnv(env, right_val)
             if type(left_eval) != type(right_eval):
-                raise evaluate_error("EQ comparison of different types")
+                return False
             return left_eval == right_eval
-            '''match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-
-                case (bool(lv), int(rv)):
-                    raise evaluate_error("EQ comparison of non-boolean values")
-                case (int(lv), bool(rv)):
-                    raise evaluate_error("EQ comparison of non-boolean values")
-                case (int(lv), int(rv)):
-                    return lv == rv
-                case (bool(lv), bool(rv)):
-                    return lv == rv
-                case _:
-                    raise evaluate_error("EQ comparison of non-boolean values")'''
         case NEq(left_val, right_val):
             left_eval = evalInEnv(env, left_val)
             right_eval = evalInEnv(env, right_val)
@@ -392,3 +380,10 @@ def run(e: ExpressionType) -> None:
                 print(f"result: {i}")
     except evaluate_error as err:
         print(err)
+
+# Tests
+
+'''
+    The domain i chose to implement is the usage of strings.
+    it is intended to be used for 
+'''
