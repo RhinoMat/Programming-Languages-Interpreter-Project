@@ -1,7 +1,6 @@
 # Interpreter that does boolean operations and normal arithmetic
 # Module imports for processing
 from dataclasses import dataclass
-#from midiutil import MIDIFile
 type LiteralVal = int | bool | str
 type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | NEq | Lt | LtE | Gt | GtE | If | Append | Replace
 # Integer Literal Arithmetic
@@ -152,24 +151,48 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
         # environment implementation for integer arithmetic
         case Add(left_val,right_val):
             match (evalInEnv(env,left_val), evalInEnv(env,right_val)):
+                case (bool(lv), int(rv)):
+                    raise evaluate_error("addition of non-integer values")
+                case (int(lv), bool(rv)):
+                    raise evaluate_error("addition of non-integer values")
+                case (bool(lv), bool(rv)):
+                    raise evaluate_error("addition of non-integer values")
                 case (int(lv), int(rv)):
                     return lv + rv
                 case _:
                     raise evaluate_error("addition of non-integer values")
         case Sub(left_val,right_val):
             match (evalInEnv(env,left_val), evalInEnv(env,right_val)):
+                case (bool(lv), int(rv)):
+                    raise evaluate_error("addition of non-integer values")
+                case (int(lv), bool(rv)):
+                    raise evaluate_error("addition of non-integer values")
+                case (bool(lv), bool(rv)):
+                    raise evaluate_error("addition of non-integer values")
                 case (int(lv), int(rv)):
                     return lv - rv
                 case _:
                     raise evaluate_error("subtraction of non-integer values")
         case Mul(left_val,right_val):
             match (evalInEnv(env,left_val), evalInEnv(env,right_val)):
+                case (bool(lv), int(rv)):
+                    raise evaluate_error("addition of non-integer values")
+                case (int(lv), bool(rv)):
+                    raise evaluate_error("addition of non-integer values")
+                case (bool(lv), bool(rv)):
+                    raise evaluate_error("addition of non-integer values")
                 case (int(lv), int(rv)):
                     return lv * rv
                 case _:
                     raise evaluate_error("multiplication of non-integer values")
         case Div(left_val,right_val):
             match (evalInEnv(env,left_val), evalInEnv(env,right_val)):
+                case (bool(lv), int(rv)):
+                    raise evaluate_error("addition of non-integer values")
+                case (int(lv), bool(rv)):
+                    raise evaluate_error("addition of non-integer values")
+                case (bool(lv), bool(rv)):
+                    raise evaluate_error("addition of non-integer values")
                 case (int(lv), int(rv)):
                     if rv == 0:
                         raise evaluate_error("division by zero")
@@ -178,23 +201,33 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                     raise evaluate_error("division of non-integer values")                
         case Neg(s):
             match evalInEnv(env,s):
+                case bool(i):
+                    raise evaluate_error("negation of non-integer value")
                 case int(i):
                     return -i
                 case _:
                     raise evaluate_error("negation of non-integer value")
         # environment implementation of boolean arithmetic
         case And(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (bool(lv), bool(rv)):
-                    return lv and rv
-                case _:
-                    raise evaluate_error("AND comparison of non-boolean values")
+            left_eval = evalInEnv(env, left_val)
+            if not isinstance(left_eval, bool):
+                raise evaluate_error("AND comparison of non-boolean values")
+            if not left_eval:  # Short-circuit: If the left operand is False, return False directly
+                return False
+            right_eval = evalInEnv(env, right_val)
+            if not isinstance(right_eval, bool):
+                raise evaluate_error("AND comparison of non-boolean values")
+            return right_eval
         case Or(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (bool(lv), bool(rv)):
-                    return lv or rv
-                case _:
-                    raise evaluate_error("OR comparison of non-boolean values")
+            left_eval = evalInEnv(env, left_val)
+            if not isinstance(left_eval, bool):
+                raise evaluate_error("OR comparison of non-boolean values")
+            if left_eval:  # Short-circuit: If the left operand is True, return True directly
+                return True
+            right_eval = evalInEnv(env, right_val)
+            if not isinstance(right_eval, bool):
+                raise evaluate_error("OR comparison of non-boolean values")
+            return right_eval
         case Not(subexpression):
             match (evalInEnv(env, subexpression)):
                 case (bool(i)):
@@ -202,41 +235,61 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                 case _:
                     raise evaluate_error("NOT transformation of a non-boolean value")
         case Eq(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+            left_eval = evalInEnv(env, left_val)
+            right_eval = evalInEnv(env, right_val)
+            if type(left_eval) != type(right_eval):
+                raise evaluate_error("EQ comparison of different types")
+            return left_eval == right_eval
+            '''match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
+
+                case (bool(lv), int(rv)):
+                    raise evaluate_error("EQ comparison of non-boolean values")
+                case (int(lv), bool(rv)):
+                    raise evaluate_error("EQ comparison of non-boolean values")
+                case (int(lv), int(rv)):
+                    return lv == rv
                 case (bool(lv), bool(rv)):
                     return lv == rv
                 case _:
-                    raise evaluate_error("EQ comparison of non-boolean values")
+                    raise evaluate_error("EQ comparison of non-boolean values")'''
         case NEq(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (bool(lv), bool(rv)):
-                    return lv != rv
-                case _:
-                    raise evaluate_error("NEQ comparison of non-boolean values")
-        case Lt(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (int(lv), int(rv)):
-                    return lv < rv
-                case _:
-                    raise evaluate_error("LT comparison of non-integer values")    
+            left_eval = evalInEnv(env, left_val)
+            right_eval = evalInEnv(env, right_val)
+            if type(left_eval) != type(right_eval):
+                raise evaluate_error("EQ comparison of different types")
+            return left_eval != right_eval
+        case Lt(left_val, right_val):  
+            left_eval = evalInEnv(env, left_val)
+            right_eval = evalInEnv(env, right_val)
+            if type(left_eval) != type(right_eval):
+                raise evaluate_error("LT comparison of different types")
+            if not isinstance(left_eval, int) or not isinstance(right_eval, int):
+                raise evaluate_error("LT comparison of non-integer values")
+            return left_eval < right_eval
         case LtE(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (int(lv), int(rv)):
-                    return lv <= rv
-                case _:
-                    raise evaluate_error("LTE comparison of non-integer values")
+            left_eval = evalInEnv(env, left_val)
+            right_eval = evalInEnv(env, right_val)
+            if type(left_eval) != type(right_eval):
+                raise evaluate_error("LTE comparison of different types")
+            if not isinstance(left_eval, int) or not isinstance(right_eval, int):
+                raise evaluate_error("LTE comparison of non-integer values")
+            return left_eval <= right_eval
         case Gt(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (int(lv), int(rv)):
-                    return lv > rv
-                case _:
-                    raise evaluate_error("GT comparison of non-integer values")
+            left_eval = evalInEnv(env, left_val)
+            right_eval = evalInEnv(env, right_val)
+            if type(left_eval) != type(right_eval):
+                raise evaluate_error("GT comparison of different types")
+            if not isinstance(left_eval, int) or not isinstance(right_eval, int):
+                raise evaluate_error("GT comparison of non-integer values")
+            return left_eval > right_eval
         case GtE(left_val, right_val):
-            match (evalInEnv(env, left_val), evalInEnv(env, right_val)):
-                case (int(lv), int(rv)):
-                    return lv >= rv
-                case _:
-                    raise evaluate_error("GTE comparison of non-integer values")
+            left_eval = evalInEnv(env, left_val)
+            right_eval = evalInEnv(env, right_val)
+            if type(left_eval) != type(right_eval):
+                raise evaluate_error("GTE comparison of different types")
+            if not isinstance(left_eval, int) or not isinstance(right_eval, int):
+                raise evaluate_error("GTE comparison of non-integer values")
+            return left_eval >= right_eval
         case If(condition, then_sect, else_sect):
             match (evalInEnv(env, condition)):
                 case (bool(c)):
