@@ -383,7 +383,21 @@ def run(e: ExpressionType) -> None:
 
 # Tests
 
+# Usage of Append()
+a: ExpressionType = Append(Lit("foo"), Lit("bar"))
+run(a)
+b: ExpressionType = Append(Lit(123), Lit(456))
+run(b)
+c: ExpressionType = Append(Lit(True), Lit(False))
+run(c)
+
+# Usage of Replace()
+d: ExpressionType = Replace(Lit("WAwarwala"), Lit("war"), Lit("iou"))
+run(d)
+e: ExpressionType = Replace(Lit(123), Lit(2), Lit(4))
+run(e)
 '''
     The domain i chose to implement is the usage of strings.
-    it is intended to be used for 
+    it is intended to be used for appending to strings (Append()) and 
+    taking a string and replacing a given substring with another string (Replace())
 '''
