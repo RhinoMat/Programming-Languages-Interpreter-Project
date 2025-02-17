@@ -4,21 +4,23 @@
 %ignore WS
 _TRUE.2: "true"
 _FALSE.2: "false"
-?expr: expr "+" term -> 
-     | expr "-" term ->
-     | expr "||" term ->
+_STRING: /"[^"]*"/
+?expr: expr "+" term -> plus
+     | expr "-" term -> minus
+     | expr "||" term -> or
      | term
-?term: term "*" factor ->
-     | term "/" factor ->
-     | term "&&" factor ->
+?term: term "*" factor -> times
+     | term "/" factor -> divide
+     | term "&&" factor -> and
      | factor
-?factor: 
-     | "-" factor ->
-     | "!" factor ->
+?factor: "-" factor -> neg
+     | "!" factor -> not
      | atom
 ?atom: ID -> id
      | INT -> int
      | _TRUE -> true
      | _FALSE -> false
+     | _STRING -> string
      | "(" expr ")"
-     | "let" ID "=" expr "in" expr "end" ->
+     | "let" ID "=" expr "in" expr "end" -> let
+     | "if" expr "then" expr "else" expr -> if
