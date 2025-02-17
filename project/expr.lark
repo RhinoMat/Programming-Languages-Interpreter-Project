@@ -7,14 +7,14 @@ _FALSE.2: "false"
 _STRING: /"[^"]*"/
 ?expr: expr "+" term -> plus
      | expr "-" term -> minus
-     | expr "||" term -> or
+     | expr "||" term -> or_
      | term
 ?term: term "*" factor -> times
      | term "/" factor -> divide
-     | term "&&" factor -> and
+     | term "&&" factor -> and_
      | factor
 ?factor: "-" factor -> neg
-     | "!" factor -> not
+     | "!" factor -> not_
      | atom
 ?atom: ID -> id
      | INT -> int
@@ -23,4 +23,4 @@ _STRING: /"[^"]*"/
      | _STRING -> string
      | "(" expr ")"
      | "let" ID "=" expr "in" expr "end" -> let
-     | "if" expr "then" expr "else" expr -> if
+     | "if" expr "then" expr "else" expr -> if_

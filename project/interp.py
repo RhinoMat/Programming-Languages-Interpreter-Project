@@ -382,7 +382,7 @@ def run(e: ExpressionType) -> None:
         print(err)
 
 # Tests
-
+'''
 # Usage of Append()
 a: ExpressionType = Append(Lit("foo"), Lit("bar"))
 run(a)
@@ -396,6 +396,7 @@ d: ExpressionType = Replace(Lit("WAwarwala"), Lit("war"), Lit("iou"))
 run(d)
 e: ExpressionType = Replace(Lit(123), Lit(2), Lit(4))
 run(e)
+'''
 '''
     The domain i chose to implement is the usage of strings.
     it is intended to be used for appending to strings (Append()) and 
