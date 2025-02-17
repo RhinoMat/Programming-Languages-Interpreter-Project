@@ -3,8 +3,7 @@ from lark import Lark, Token, ParseTree, Transformer
 from lark.exceptions import VisitError
 from pathlib import Path
 
-parser = Lark(Path('expr.lark').read_text(),start='expr',ambiguity='explicit')
-
+parser = Lark(Path('expr.lark').read_text(),start='expr',parser='earley',ambiguity='explicit')
 class ParseError(Exception):
     pass
 def parse(s: str) -> ParseTree:
@@ -64,6 +63,7 @@ class ToExpr(Transformer[Token,ExpressionType]):
     def app(self,args:tuple[ExpressionType,ExpressionType]) -> ExpressionType:
         return App(args[0],args[1])
     def _ambig(self,_) -> ExpressionType:
+        print("Ambiguous parse detected:", _)
         raise AmbiguousParse()
 def genAST(t:ParseTree) -> ExpressionType:
     '''Applies the transformer to convert a parse tree into an AST'''
@@ -110,3 +110,4 @@ def parse_and_run(s:str):
         print("parse error:")
         print(e)
 #driver()
+parse_and_run("true && false")

@@ -8,19 +8,35 @@ _STRING: /"[^"]*"/
 ?expr: expr "+" term -> plus
      | expr "-" term -> minus
      | expr "||" term -> or_
+     | term "&&" factor -> and_
+     | expr "==" term -> eq
+     | expr "!=" term -> neq
+     | expr "<" term -> lt
+     | expr "<=" term -> lte
+     | expr ">" term -> gt
+     | expr ">=" term -> gte
      | term
 ?term: term "*" factor -> times
      | term "/" factor -> divide
-     | term "&&" factor -> and_
      | factor
 ?factor: "-" factor -> neg
      | "!" factor -> not_
      | atom
-?atom: ID -> id
-     | INT -> int
-     | _TRUE -> true
+?atom: _TRUE -> true
      | _FALSE -> false
+     | ID -> id
+     | INT -> int
      | _STRING -> string
      | "(" expr ")"
      | "let" ID "=" expr "in" expr "end" -> let
      | "if" expr "then" expr "else" expr -> if_
+     | ID "(" expr ")" -> app
+     | "fun" ID "(" ID ")" "{" expr "}" -> letfun
+     
+%left "||"
+%left "&&"
+%left "==" "!="
+%left "<" "<=" ">" ">="
+%left "+" "-"
+%left "*" "/"
+%right "!"
