@@ -5,7 +5,7 @@ from dataclasses import dataclass
 # LiteralVal marks the classes that can be utilized for literal or plain values
 type LiteralVal = int | bool | str
 # ExpressionType marks the available functions to utilize for the interpreter AST
-type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | NEq | Lt | LtE | Gt | GtE | If | Append | Replace
+type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | NEq | Lt | LtE | Gt | GtE | If | Append | Replace | Letfun | App
 # Integer Literal Arithmetic
 # Add() accepts 2 integers for addition
 # ex: 4 + 5 = 9
@@ -176,6 +176,20 @@ class Name():
     var_name: str
     def __str__(self) -> str:
         return self.var_name
+@dataclass
+class Letfun():
+    name: str
+    param: str
+    bodyexpr: ExpressionType
+    inexpr: ExpressionType
+    def __str__(self) -> str:
+        return f"letfun {self.name} ({self.param}) = {self.bodyexpr} in {self.inexpr} end"
+@dataclass
+class App():
+    fun: ExpressionType
+    arg: ExpressionType
+    def __str__(self) -> str:
+        return f"({self.fun} ({self.arg}))"
 type Bind[V] = tuple[str, V]
 type Environment[V] = tuple[Bind[V], ...]
 from typing import Any
@@ -193,7 +207,12 @@ def lookup_environment[V](name: str, env: Environment[V]) -> (V | None):
             return None
 class evaluate_error(Exception):
     pass
-type blank = int | bool | str
+type blank = int | bool | str | Closure
+@dataclass
+class Closure():
+    param:str
+    body:ExpressionType
+    env: Environment[blank]
 def eval(e: ExpressionType) -> blank:
     return evalInEnv(blank_env, e)
 def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
@@ -359,6 +378,8 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                     return i
                 case str(i):
                     return i
+                case _:
+                    return i
         case Name(n):
             v = lookup_environment(n, env)
             if v is None:
@@ -368,6 +389,20 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
             v = evalInEnv(env, d)
             newEnv = extend_environment(n, v, env)
             return evalInEnv(newEnv, b)
+        case Letfun(n,p,b,i):
+            c = Closure(p,b,env)
+            newEnv = extend_environment(n,c,env)
+            c.env = newEnv
+            return evalInEnv(newEnv,i)
+        case App(f,a):
+            fun = evalInEnv(env,f)
+            arg = evalInEnv(env,a)
+            match fun:
+                case Closure(p,b,cenv):
+                    newEnv = extend_environment(p,arg,cenv)
+                    return evalInEnv(newEnv,b)
+                case _:
+                    raise evaluate_error("application of non-function entity")
 def run(e: ExpressionType) -> None:
     print(f"running: {e}")
     try:

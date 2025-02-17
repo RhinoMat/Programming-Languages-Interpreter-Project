@@ -1,4 +1,4 @@
-from interp import Add, Sub, Mul, Div, Neg, Let, Name, Lit, If, ExpressionType, And, Or, Lt, LtE, Gt, GtE, Not, NEq, Eq, run
+from interp import Add, Sub, Mul, Div, Neg, Let, Name, Lit, If, ExpressionType, And, Or, Lt, LtE, Gt, GtE, Not, NEq, Eq, run, Letfun, App
 from lark import Lark, Token, ParseTree, Transformer
 from lark.exceptions import VisitError
 from pathlib import Path
@@ -59,6 +59,10 @@ class ToExpr(Transformer[Token,ExpressionType]):
         return Lit(False)
     def string(self, args: tuple[Token]) -> ExpressionType:
         return Lit(args[0].value[1:-1])  # Remove the quotes
+    def letfun(self,args:tuple[Token,Token,ExpressionType,ExpressionType]) -> ExpressionType:
+        return Letfun(args[0].value,args[1].value,args[2],args[3])
+    def app(self,args:tuple[ExpressionType,ExpressionType]) -> ExpressionType:
+        return App(args[0],args[1])
     def _ambig(self,_) -> ExpressionType:
         raise AmbiguousParse()
 def genAST(t:ParseTree) -> ExpressionType:
