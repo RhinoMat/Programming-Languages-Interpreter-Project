@@ -91,4 +91,18 @@ def driver():
         except EOFError:
             break
 
-driver()
+def parse_and_run(s:str):
+    try:
+        t = parse(s)
+        print("raw:", t)    
+        print("pretty:")
+        print(t.pretty())
+        ast = genAST(t)
+        print("raw AST:", repr(ast))  # use repr() to avoid str() pretty-printing
+        run(ast)                      # pretty-prints and executes the AST
+    except AmbiguousParse:
+        print("ambiguous parse")                
+    except ParseError as e:
+        print("parse error:")
+        print(e)
+#driver()
