@@ -110,4 +110,4 @@ def parse_and_run(s:str):
         print("parse error:")
         print(e)
 #driver()
-parse_and_run("true && false")
+#parse_and_run("true && false")
