@@ -2,9 +2,10 @@
 %import common.CNAME -> ID
 %import common.WS
 %ignore WS
-_TRUE.2: "true"
-_FALSE.2: "false"
+_TRUE: "true"
+_FALSE: "false"
 _STRING: /"[^"]*"/
+?start: expr
 ?expr: expr "+" term -> plus
      | expr "-" term -> minus
      | expr "||" term -> or_
@@ -32,11 +33,3 @@ _STRING: /"[^"]*"/
      | "if" expr "then" expr "else" expr -> if_
      | ID "(" expr ")" -> app
      | "fun" ID "(" ID ")" "{" expr "}" -> letfun
-     
-%left "||"
-%left "&&"
-%left "==" "!="
-%left "<" "<=" ">" ">="
-%left "+" "-"
-%left "*" "/"
-%right "!"

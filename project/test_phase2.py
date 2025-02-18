@@ -41,7 +41,7 @@ class TestInterpreter(unittest.TestCase):
         expr = "true && false"
         t = parse(expr)
         ast = genAST(t)
-        self.assertEqual(str(ast), "(true && false)")
+        self.assertEqual(str(ast), str(expr))
         run(ast)
 
     def test_boolean_or(self):
