@@ -5,7 +5,7 @@ from dataclasses import dataclass
 # LiteralVal marks the classes that can be utilized for literal or plain values
 type LiteralVal = int | bool | str
 # ExpressionType marks the available functions to utilize for the interpreter AST
-type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | NEq | Lt | LtE | Gt | GtE | If | Append | Replace | Letfun | App
+type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | NEq | Lt | LtE | Gt | GtE | If | Append | Replace | Letfun | App | Exp | Search
 # Integer Literal Arithmetic
 # Add() accepts 2 integers for addition
 # ex: 4 + 5 = 9
@@ -44,6 +44,12 @@ class Div():
     right_val: ExpressionType
     def __str__(self) -> str:
         return f"({self.left_val} / {self.right_val})"
+@dataclass
+class Exp():
+    left_val: ExpressionType
+    right_val: ExpressionType
+    def __str__(self) -> str:
+        return f"({self.left_val} ^ {self.right_val})"
 # Neg() accepts 1 integer for negation
 # flips the value of a positive to a negative and vice versa
 # ex: Neg(Lit(6)) = -6
@@ -158,6 +164,13 @@ class Replace():
     replacement: ExpressionType
     def __str__(self) -> str:
         return f"(in {self.initial_string} replacing first {self.to_replace} with {self.replacement})"
+# Search() takes an initial string and returns the number of times a string occurs
+@dataclass
+class Search():
+    initial_string: ExpressionType
+    to_find: ExpressionType
+    def __str__(self) -> str:
+        return f"(finding {self.to_find} in {self.initial_string})"
 # Value Declaration and name assignment
 @dataclass
 class Lit():
@@ -267,7 +280,19 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                         raise evaluate_error("division by zero")
                     return lv // rv
                 case _:
-                    raise evaluate_error("division of non-integer values")                
+                    raise evaluate_error("division of non-integer values")        
+        case Exp(left_val, right_val):
+            match (evalInEnv(env,left_val), evalInEnv(env,right_val)):
+                case (bool(lv), int(rv)):
+                    raise evaluate_error("exponentiation of non-integer values")
+                case (int(lv), bool(rv)):
+                    raise evaluate_error("exponentiation of non-integer values")
+                case (bool(lv), bool(rv)):
+                    raise evaluate_error("exponentiation of non-integer values")
+                case (int(lv), int(rv)):
+                    return lv ** rv
+                case _:
+                    raise evaluate_error("exponentiation of non-integer values")
         case Neg(s):
             match evalInEnv(env,s):
                 case bool(i):
@@ -369,6 +394,12 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                     return istring.replace(torep, repl, 1)
                 case _:
                     raise evaluate_error("REPLACE operation with non-string values")
+        case Search(initial_string, to_find):
+            match(evalInEnv(env, initial_string), evalInEnv(env, to_find)):
+                case (str(istring), str(tofind)):
+                    return istring.count(tofind)
+                case _:
+                    raise evaluate_error("SEARCH operation with non-string values")
         # environment implementation of let and binding
         case Lit(lit) :
             match lit:  # two-level matching keeps type-checker happy

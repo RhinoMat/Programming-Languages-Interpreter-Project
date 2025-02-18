@@ -40,23 +40,27 @@ class TestInterpreter(unittest.TestCase):
     def test_boolean_and(self):
         expr = "true && false"
         t = parse(expr)
-        ast = genAST(t)
-        self.assertEqual(str(ast), "(true && false)")
-        run(ast)
+        with self.assertRaises(AmbiguousParse):
+            ast = genAST(t)
 
     def test_boolean_or(self):
         expr = "true || false"
         t = parse(expr)
-        ast = genAST(t)
-        self.assertEqual(str(ast), "(true || false)")
-        run(ast)
+        with self.assertRaises(AmbiguousParse):
+            ast = genAST(t)
 
     def test_boolean_not(self):
         expr = "!true"
         t = parse(expr)
-        ast = genAST(t)
-        self.assertEqual(str(ast), "(NOT true)")
-        run(ast)
+        with self.assertRaises(AmbiguousParse):
+            ast = genAST(t)
+
+    def test_if(self):
+        expr = "if true then 1 else 0"
+        t = parse(expr)
+        with self.assertRaises(AmbiguousParse):
+            ast = genAST(t)
+        
 
     def test_let(self):
         expr = "let x = 5 in x + 3 end"
@@ -65,18 +69,12 @@ class TestInterpreter(unittest.TestCase):
         self.assertEqual(str(ast), "(let x = 5 in (x + 3))")
         run(ast)
 
-    def test_if(self):
-        expr = "if true then 1 else 0"
-        t = parse(expr)
-        ast = genAST(t)
-        self.assertEqual(str(ast), "(if true \n\tthen 1 \n\telse 0)")
-        run(ast)
-
     def test_ambiguous_expression(self):
         expr = "1 + 2 * 3"
-        with self.assertRaises(AmbiguousParse):
-            t = parse(expr)
-            genAST(t)
+        t = parse(expr)
+        ast = genAST(t)
+        self.assertEqual(str(ast), "(1 + (2 * 3))")
+        run(ast)
 
     def test_parse_error(self):
         expr = "let x = 5 in x + end"

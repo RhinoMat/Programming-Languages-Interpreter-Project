@@ -1,4 +1,4 @@
-from interp import Add, Sub, Mul, Div, Neg, Let, Name, Lit, If, ExpressionType, And, Or, Lt, LtE, Gt, GtE, Not, NEq, Eq, run, Letfun, App
+from interp import Add, Sub, Mul, Div, Neg, Let, Name, Lit, If, ExpressionType, And, Or, Lt, LtE, Gt, GtE, Not, NEq, Eq, run, Letfun, App, Append, Replace, Search, Exp
 from lark import Lark, Token, ParseTree, Transformer
 from lark.exceptions import VisitError
 from pathlib import Path
@@ -24,6 +24,8 @@ class ToExpr(Transformer[Token,ExpressionType]):
         return Mul(args[0], args[1])
     def divide(self, args:tuple[ExpressionType, ExpressionType]) -> ExpressionType:
         return Div(args[0], args[1])
+    def expon(self, args:tuple[ExpressionType, ExpressionType]) -> ExpressionType:
+        return Exp(args[0], args[1])
     def neg(self, args: tuple[ExpressionType]) -> ExpressionType:
         return Neg(args[0])
     def and_(self, args: tuple[ExpressionType, ExpressionType]) -> ExpressionType:
@@ -48,6 +50,12 @@ class ToExpr(Transformer[Token,ExpressionType]):
         return Let(args[0].value, args[1], args[2])
     def if_(self, args: tuple[ExpressionType, ExpressionType, ExpressionType]) -> ExpressionType:
         return If(args[0], args[1], args[2])
+    def append(self, args: tuple[ExpressionType, ExpressionType]) -> ExpressionType:
+        return Append(args[0], args[1])
+    def replace(self, args: tuple[ExpressionType, ExpressionType, ExpressionType]) -> ExpressionType:
+        return Replace(args[0], args[1], args[2])
+    def search(self, args: tuple[ExpressionType, ExpressionType]) -> ExpressionType:
+        return Search(args[0], args[1])
     def id(self, args:tuple[Token]) -> ExpressionType:
         return Name(args[0].value)
     def int(self, args: tuple[Token]) -> ExpressionType:
@@ -110,4 +118,3 @@ def parse_and_run(s:str):
         print("parse error:")
         print(e)
 #driver()
-#parse_and_run("true && false")
