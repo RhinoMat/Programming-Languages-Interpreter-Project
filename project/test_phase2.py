@@ -40,14 +40,8 @@ class TestInterpreter(unittest.TestCase):
     def test_boolean_and(self):
         expr = "true && false"
         t = parse(expr)
-<<<<<<< HEAD
         with self.assertRaises(AmbiguousParse):
             ast = genAST(t)
-=======
-        ast = genAST(t)
-        self.assertEqual(str(ast), str(expr))
-        run(ast)
->>>>>>> 20f23eb371a20e466c50bcd75729640bb35271cb
 
     def test_boolean_or(self):
         expr = "true || false"
