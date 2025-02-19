@@ -3,6 +3,7 @@ from lark import Lark, Token, ParseTree, Transformer
 from lark.exceptions import VisitError
 from pathlib import Path
 
+# parser brings in the interpreter grammar from lark and uses a parser style
 parser = Lark(Path('expr.lark').read_text(),start='expr',parser='earley',ambiguity='explicit')
 class ParseError(Exception):
     pass
@@ -15,6 +16,7 @@ def parse(s: str) -> ParseTree:
 class AmbiguousParse(Exception):
     pass
 
+# translates statements given in the expression from human language into functions to funnel the information
 class ToExpr(Transformer[Token,ExpressionType]):
     def plus(self, args:tuple[ExpressionType, ExpressionType]) -> ExpressionType:
         return Add(args[0], args[1])
