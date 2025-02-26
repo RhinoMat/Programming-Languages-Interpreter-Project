@@ -5,7 +5,9 @@ from dataclasses import dataclass
 # LiteralVal marks the classes that can be utilized for literal or plain values
 type LiteralVal = int | bool | str
 # ExpressionType marks the available functions to utilize for the interpreter AST
-type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | Or | Not | Eq | NEq | Lt | LtE | Gt | GtE | If | Append | Replace | Letfun | App | Exp | Search
+type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | \
+                    Or | Not | Eq | NEq | Lt | LtE | Gt | GtE | If | Append | \
+                    Replace | Letfun | App | Exp | Search | Assign | Seq | Show | Read
 # Integer Literal Arithmetic
 # Add() accepts 2 integers for addition
 # ex: 4 + 5 = 9

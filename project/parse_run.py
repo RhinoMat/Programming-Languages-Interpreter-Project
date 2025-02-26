@@ -119,4 +119,6 @@ def parse_and_run(s:str):
     except ParseError as e:
         print("parse error:")
         print(e)
+def just_parse(s:str):
+    pass
 #driver()
