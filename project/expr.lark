@@ -5,7 +5,7 @@
 
 _TRUE.2: "true"
 _FALSE.2: "false"
-_STRING: /"[^"]*"/
+STRING: /"[^"]*"/
 
 ?start: expr
 
@@ -46,7 +46,7 @@ _STRING: /"[^"]*"/
      | _FALSE -> false
      | ID -> id
      | INT -> int
-     | _STRING -> string
+     | STRING -> string
      | "(" expr ")"
      | "let" ID "=" expr "in" expr "end" -> let
      | "if" expr "then" expr "else" expr -> if_
