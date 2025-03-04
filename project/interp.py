@@ -8,6 +8,32 @@ type LiteralVal = int | bool | str
 type ExpressionType = Add | Sub | Mul | Div | Neg | Lit | Let | Name | And | \
                     Or | Not | Eq | NEq | Lt | LtE | Gt | GtE | If | Append | \
                     Replace | Letfun | App | Exp | Search | Assign | Seq | Show | Read
+type Program = Block
+type Decl = VarDecl
+type Stmt = Block | Assign | If | While | Print
+@dataclass 
+class Block():
+    decls: list[Decl]
+    stmts: list[Stmt]
+    def __str__(self) -> str:
+        return "{" + "; ".join([str(s) for s in self.decls + self.stmts]) + "}"
+@dataclass
+class VarDecl():
+    name: str
+    expr: ExpressionType
+    def __str__(self) -> str:
+        return f"var {self.name} := {self.expr}"
+@dataclass
+class While():
+    cond: ExpressionType
+    body: Stmt
+    def __str__(self) -> str:
+        return f"while {self.cond} do {self.body}"
+@dataclass
+class Print():
+    expr: ExpressionType
+    def __str__(self) -> str:
+        return f"print {self.expr}"
 # Integer Literal Arithmetic
 # Add() accepts 2 integers for addition
 # ex: 4 + 5 = 9
@@ -207,7 +233,10 @@ class App():
         return f"({self.fun} ({self.arg}))"
 @dataclass
 class Assign():
-    pass
+    name: str
+    expr: ExpressionType
+    def __str__(self) -> str:
+        return f"{self.name} := {self.expr}"
 @dataclass
 class Seq():
     pass
@@ -232,9 +261,17 @@ def lookup_environment[V](name: str, env: Environment[V]) -> (V | None):
                 return lookup_environment(name, rest)
         case _:
             return None
+type Loc[V] = list[V]
+def newLoc[V](value: V) -> Loc[V]:
+    return [value]
+def getLoc[V](loc: Loc[V]) -> V:
+    return loc[0]
+def setLoc[V](loc: Loc[V], value: V) -> None:
+    loc[0] = value
 class evaluate_error(Exception):
     pass
 type blank = int | bool | str | Closure
+
 @dataclass
 class Closure():
     param:str
