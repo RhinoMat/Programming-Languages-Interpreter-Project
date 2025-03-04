@@ -60,18 +60,20 @@ class ToExpr(Transformer[Token,ExpressionType]):
         return Search(args[0], args[1])
     def id(self, args:tuple[Token]) -> ExpressionType:
         return Name(args[0].value)
-    def int(self, args: tuple[Token]) -> ExpressionType:
+    def int_literal(self, args: tuple[Token]) -> ExpressionType:
         return Lit(int(args[0].value))
-    def true(self, _) -> ExpressionType:
-        return Lit(True)
-    def false(self, _) -> ExpressionType:
-        return Lit(False)
-    def string(self, args: tuple[Token]) -> ExpressionType:
+    #def true_literal(self, _) -> ExpressionType:
+    #    return Lit(True)
+    #def false_literal(self, _) -> ExpressionType:
+    #    return Lit(False)
+    def string_literal(self, args: tuple[Token]) -> ExpressionType:
         return Lit(args[0].value[1:-1])  # Remove the quotes
     def letfun(self,args:tuple[Token,Token,ExpressionType,ExpressionType]) -> ExpressionType:
         return Letfun(args[0].value,args[1].value,args[2],args[3])
     def app(self,args:tuple[ExpressionType,ExpressionType]) -> ExpressionType:
         return App(args[0],args[1])
+    def bool_literal(self, args: tuple[Token]) -> ExpressionType:
+        return Lit(args[0].value == "true")
     def _ambig(self,_) -> ExpressionType:
         print("Ambiguous parse detected:", _)
         raise AmbiguousParse()
@@ -121,4 +123,4 @@ def parse_and_run(s:str):
         print(e)
 def just_parse(s:str):
     pass
-#driver()
+driver()

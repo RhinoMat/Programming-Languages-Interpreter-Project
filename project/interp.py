@@ -451,7 +451,8 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
 def run(e: ExpressionType) -> None:
     print(f"running: {e}")
     try:
-        match eval(e):
+        result = eval(e)
+        match result:
             case int(i):
                 print(f"result: {i}")
             case bool(i):

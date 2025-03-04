@@ -1,10 +1,13 @@
+# fixed lark file by fixing original precedence and rearranging grammar
+# i also changed _STRING to STRING as was advised on the rubric
+# changed fun to letfun under ?atom
+# changed 
 %import common.INT -> INT
 %import common.CNAME -> ID
 %import common.WS
 %ignore WS
-_TRUE.2: "true"
-_FALSE.2: "false"
-STRING: /"[^"]*"/
+%import common.ESCAPED_STRING -> STRING
+BOOL.2: "true" | "false"
 ?start: expr
 ?expr: if_expr
 ?if_expr: or_expr
@@ -32,15 +35,13 @@ STRING: /"[^"]*"/
         | expon_expr "^" expon_expr -> expon
 ?unary_expr: atom
         | "-" unary_expr -> neg
-?atom: _TRUE -> true
-        | _FALSE -> false
+?atom:  BOOL -> bool_literal
         | ID -> id
-        | INT -> int
-        | STRING -> string
+        | INT -> int_literal
+        | STRING -> string_literal
         | "(" expr ")"
         | "let" ID "=" expr "in" expr "end" -> let
         | ID "(" expr ")" -> app
-        | "fun" ID "(" ID ")" "{" expr "}" -> letfun
         | expr "+=" expr -> append
         | "in" expr "replacing first" expr "with" expr -> replace
         | "finding" expr "in" expr -> search
