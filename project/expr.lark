@@ -3,11 +3,12 @@
 # changed fun to letfun under ?atom
 # changed 
 %import common.INT -> INT
-%import common.CNAME -> ID
+#%import common.CNAME -> ID
 %import common.WS
 %ignore WS
 %import common.ESCAPED_STRING -> STRING
-BOOL.2: "true" | "false"
+BOOL: "true" | "false"
+ID: /(?!true\b)(?!false\b)[a-zA-Z_][a-zA-Z0-9_]*/
 ?start: expr
 ?expr: if_expr
 ?if_expr: or_expr
