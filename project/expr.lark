@@ -2,56 +2,46 @@
 %import common.CNAME -> ID
 %import common.WS
 %ignore WS
-
 _TRUE.2: "true"
 _FALSE.2: "false"
 STRING: /"[^"]*"/
-
 ?start: expr
-
-?expr: or_expr
-
+?expr: if_expr
+?if_expr: or_expr
+        | "if" expr "then" expr "else" expr -> if_
 ?or_expr: and_expr
         | or_expr "||" and_expr   -> or_
-
-?and_expr: equality_expr
-         | and_expr "&&" equality_expr -> and_
-
-?equality_expr: relational_expr
-              | equality_expr "==" relational_expr -> eq
-              | equality_expr "!=" relational_expr -> neq
-
-?relational_expr: additive_expr
-                | relational_expr "<" additive_expr -> lt
-                | relational_expr "<=" additive_expr -> lte
-                | relational_expr ">" additive_expr -> gt
-                | relational_expr ">=" additive_expr -> gte
-
+?and_expr: not_expr
+        | and_expr "&&" not_expr -> and_
+?not_expr: equality_expr
+        | "!" not_expr -> not_
+?equality_expr: additive_expr
+        | equality_expr "==" additive_expr -> eq
+        | equality_expr "!=" additive_expr -> neq
+        | equality_expr "<" additive_expr -> lt
+        | equality_expr "<=" additive_expr -> lte
+        | equality_expr ">" additive_expr -> gt
+        | equality_expr ">=" additive_expr -> gte
 ?additive_expr: multiplicative_expr
-              | additive_expr "+" multiplicative_expr -> plus
-              | additive_expr "-" multiplicative_expr -> minus
-
-?multiplicative_expr: unary_expr
-                    | multiplicative_expr "*" unary_expr -> times
-                    | multiplicative_expr "/" unary_expr -> divide
-
-?unary_expr: exp_expr
-           | "-" unary_expr -> neg
-           | "!" unary_expr -> not_
-
-?exp_expr: atom
-           | exp_expr "^" exp_expr -> expon
-
+        | additive_expr "+" multiplicative_expr -> plus
+        | additive_expr "-" multiplicative_expr -> minus
+?multiplicative_expr: expon_expr
+        | multiplicative_expr "*" expon_expr -> times
+        | multiplicative_expr "/" expon_expr -> divide
+?expon_expr: unary_expr
+        | expon_expr "^" expon_expr -> expon
+?unary_expr: atom
+        | "-" unary_expr -> neg
 ?atom: _TRUE -> true
-     | _FALSE -> false
-     | ID -> id
-     | INT -> int
-     | STRING -> string
-     | "(" expr ")"
-     | "let" ID "=" expr "in" expr "end" -> let
-     | "if" expr "then" expr "else" expr -> if_
-     | ID "(" expr ")" -> app
-     | "fun" ID "(" ID ")" "{" expr "}" -> letfun
-     | expr "+=" expr -> append
-     | "in" expr "replacing first" expr "with" expr -> replace
-     | "finding" expr "in" expr -> search
+        | _FALSE -> false
+        | ID -> id
+        | INT -> int
+        | STRING -> string
+        | "(" expr ")"
+        | "let" ID "=" expr "in" expr "end" -> let
+        | ID "(" expr ")" -> app
+        | "fun" ID "(" ID ")" "{" expr "}" -> letfun
+        | expr "+=" expr -> append
+        | "in" expr "replacing first" expr "with" expr -> replace
+        | "finding" expr "in" expr -> search
+        | "letfun" ID "(" ID ")" "=" expr "in" expr "end" -> letfun

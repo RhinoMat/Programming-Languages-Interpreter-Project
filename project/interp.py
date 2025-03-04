@@ -205,6 +205,18 @@ class App():
     arg: ExpressionType
     def __str__(self) -> str:
         return f"({self.fun} ({self.arg}))"
+@dataclass
+class Assign():
+    pass
+@dataclass
+class Seq():
+    pass
+@dataclass
+class Show():
+    pass
+@dataclass
+class Read():
+    pass
 type Bind[V] = tuple[str, V]
 type Environment[V] = tuple[Bind[V], ...]
 from typing import Any
