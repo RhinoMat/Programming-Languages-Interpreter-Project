@@ -10,7 +10,11 @@
 BOOL: "true" | "false"
 ID: /(?!true\b)(?!false\b)[a-zA-Z_][a-zA-Z0-9_]*/
 ?start: expr
-?expr: if_expr
+?expr: seq_expr
+?seq_expr: assign_expr
+        | seq_expr ";" assign_expr -> seq
+?assign_expr: if_expr
+        | ID ":=" if_expr -> assign
 ?if_expr: or_expr
         | "if" expr "then" expr "else" expr -> if_
 ?or_expr: and_expr
@@ -47,3 +51,5 @@ ID: /(?!true\b)(?!false\b)[a-zA-Z_][a-zA-Z0-9_]*/
         | "in" expr "replacing first" expr "with" expr -> replace
         | "finding" expr "in" expr -> search
         | "letfun" ID "(" ID ")" "=" expr "in" expr "end" -> letfun
+        | "show" expr -> show
+        | "read" -> read

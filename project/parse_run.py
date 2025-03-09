@@ -1,4 +1,4 @@
-from interp import Add, Sub, Mul, Div, Neg, Let, Name, Lit, If, ExpressionType, And, Or, Lt, LtE, Gt, GtE, Not, NEq, Eq, run, Letfun, App, Append, Replace, Search, Exp
+from interp import Add, Sub, Mul, Div, Neg, Let, Name, Lit, If, ExpressionType, And, Or, Lt, LtE, Gt, GtE, Not, NEq, Eq, run, Letfun, App, Append, Replace, Search, Exp, Assign, Seq, Show, Read
 from lark import Lark, Token, ParseTree, Transformer
 from lark.exceptions import VisitError
 from pathlib import Path
@@ -74,6 +74,14 @@ class ToExpr(Transformer[Token,ExpressionType]):
         return App(args[0],args[1])
     def bool_literal(self, args: tuple[Token]) -> ExpressionType:
         return Lit(args[0].value == "true")
+    def assign(self, args: tuple[Token, ExpressionType]) -> ExpressionType:
+        return Assign(args[0].value, args[1])
+    def seq(self, args: tuple[ExpressionType, ExpressionType]) -> ExpressionType:
+        return Seq(args[0], args[1])
+    def show(self, args: tuple[ExpressionType]) -> ExpressionType:
+        return Show(args[0])
+    def read(self, _) -> ExpressionType:
+        return Read()
     def _ambig(self,_) -> ExpressionType:
         print("Ambiguous parse detected:", _)
         raise AmbiguousParse()

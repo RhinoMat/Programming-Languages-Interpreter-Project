@@ -239,13 +239,19 @@ class Assign():
         return f"{self.name} := {self.expr}"
 @dataclass
 class Seq():
-    pass
+    first: ExpressionType
+    second: ExpressionType
+    def __str__(self) -> str:
+        return f"{self.first}; {self.second}"
 @dataclass
 class Show():
-    pass
+    expr: ExpressionType
+    def __str__(self) -> str:
+        return f"show {self.expr}"
 @dataclass
 class Read():
-    pass
+    def __str__(self) -> str:
+        return "read"
 type Bind[V] = tuple[str, V]
 type Environment[V] = tuple[Bind[V], ...]
 from typing import Any
@@ -469,11 +475,13 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
             return v
         case Let(n,d,b):
             v = evalInEnv(env, d)
-            newEnv = extend_environment(n, v, env)
+            loc = newLoc(v)
+            newEnv = extend_environment(n, loc, env)
             return evalInEnv(newEnv, b)
         case Letfun(n,p,b,i):
             c = Closure(p,b,env)
-            newEnv = extend_environment(n,c,env)
+            loc = newLoc(c)
+            newEnv = extend_environment(n,loc,env)
             c.env = newEnv
             return evalInEnv(newEnv,i)
         case App(f,a):
@@ -481,10 +489,31 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
             arg = evalInEnv(env,a)
             match fun:
                 case Closure(p,b,cenv):
-                    newEnv = extend_environment(p,arg,cenv)
+                    newEnv = extend_environment(p,newLoc(arg),cenv)
                     return evalInEnv(newEnv,b)
                 case _:
                     raise evaluate_error("application of non-function entity")
+        case Assign(name, expr): 
+            value = evalInEnv(env, expr)
+            loc = lookup_environment(name, env)
+            if loc is None:
+                raise evaluate_error(f"unbound name {name}")
+            if not isinstance(loc, list):
+                raise evaluate_error(f"cannot assign to function name {name}")
+            setLoc(loc, value)
+            return value
+        case Seq(first, second):
+            evalInEnv(env, first)
+            return evalInEnv(env, second)
+        case Show(expr):
+            value = evalInEnv(env, expr)
+            print(f"show: {value}")
+            return value
+        case Read():
+            user_input = input("Enter an integer: ")
+            try: return int(user_input)
+            except ValueError:
+                raise evaluate_error("input is not an integer")
 def run(e: ExpressionType) -> None:
     print(f"running: {e}")
     try:
