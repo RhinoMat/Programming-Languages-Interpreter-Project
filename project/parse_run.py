@@ -71,12 +71,14 @@ class ToExpr(Transformer[Token,ExpressionType]):
     def letfun(self,args:tuple[Token,Token,ExpressionType,ExpressionType]) -> ExpressionType:
         return Letfun(args[0].value,args[1].value,args[2],args[3])
     def app(self,args:tuple[ExpressionType,ExpressionType]) -> ExpressionType:
-        return App(args[0],args[1])
+        return App(Name(args[0]),args[1])
     def bool_literal(self, args: tuple[Token]) -> ExpressionType:
         return Lit(args[0].value == "true")
     def assign(self, args: tuple[Token, ExpressionType]) -> ExpressionType:
         return Assign(args[0].value, args[1])
     def seq(self, args: tuple[ExpressionType, ExpressionType]) -> ExpressionType:
+        if isinstance(args[0], Seq):
+            return Seq(args[0].first, Seq(args[0].second, args[1]))
         return Seq(args[0], args[1])
     def show(self, args: tuple[ExpressionType]) -> ExpressionType:
         return Show(args[0])
@@ -132,5 +134,5 @@ def parse_and_run(s:str):
 def just_parse(s:str):
     t = parse(s)
     return genAST(t)
-#if __name__  == "__main__":
-#    driver()
+if __name__  == "__main__":
+    driver()
