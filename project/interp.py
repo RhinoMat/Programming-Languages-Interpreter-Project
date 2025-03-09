@@ -199,6 +199,20 @@ class Search():
     to_find: ExpressionType
     def __str__(self) -> str:
         return f"(finding {self.to_find} in {self.initial_string})"
+# Reverse() takes an initial string and reverses it
+@dataclass
+class Reverse():
+    expr: ExpressionType
+    def __str__(self) -> str:
+        return f"reverse {self.expr}"
+# Substring() takes out a substring from a string
+@dataclass
+class SubString():
+    expr: ExpressionType
+    start: ExpressionType
+    end: ExpressionType
+    def __str__(self) -> str:
+        return f"substring {self.expr} from {self.start} to {self.end}"
 # Value Declaration and name assignment
 @dataclass
 class Lit():
@@ -457,6 +471,18 @@ def evalInEnv(env: Environment[blank], e: ExpressionType) -> blank:
                     return istring.count(tofind)
                 case _:
                     raise evaluate_error("SEARCH operation with non-string values")
+        case Reverse(expr):
+            value = evalInEnv(env, expr)
+            if not isinstance(value, str):
+                raise evaluate_error("reverse operation on non-string value")
+            return value[::-1]
+        case SubString(expr, start, end):
+            value = evalInEnv(env, expr)
+            start_idx = evalInEnv(env, start)
+            end_idx = evalInEnv(env, end)
+            if not isinstance(value, str) or not isinstance(start_idx, int) or not isinstance(end_idx, int):
+                raise evaluate_error("substring operation with invalid types")
+            return value[start_idx:end_idx]
         # environment implementation of let and binding
         case Lit(lit) :
             match lit:  # two-level matching keeps type-checker happy

@@ -130,5 +130,7 @@ def parse_and_run(s:str):
         print("parse error:")
         print(e)
 def just_parse(s:str):
-    pass
-driver()
+    t = parse(s)
+    return genAST(t)
+#if __name__  == "__main__":
+#    driver()
