@@ -134,5 +134,5 @@ def parse_and_run(s:str):
 def just_parse(s:str):
     t = parse(s)
     return genAST(t)
-if __name__  == "__main__":
-    driver()
+#if __name__  == "__main__":
+#    driver()
